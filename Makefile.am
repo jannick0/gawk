@@ -77,6 +77,7 @@ SUBDIRS += extras doc awklib po test
 # what to make and install
 bin_PROGRAMS = gawk
 include_HEADERS = gawkapi.h
+BUILT_SOURCES = $(srcdir)/pc/Makefile.tst
 
 # sources for both gawk and dgawk
 base_sources = \
@@ -170,8 +171,7 @@ uninstall-recursive: uninstall-links
 check-local: gawk$(EXEEXT)
 
 # A little extra clean up when making distributions.
-# And additional set up for the pc directory.
-dist-hook: pc/Makefile.tst
+dist-hook:
 	cd "$(distdir)"/extension ; rm -f *.o *.so
 	cd "$(srcdir)"/pc ; \
 	chmod u+w config.h ; \
