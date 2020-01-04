@@ -128,8 +128,9 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/arch.m4 \
 	$(top_srcdir)/m4/mpfr.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/noreturn.m4 $(top_srcdir)/m4/po.m4 \
 	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/readline.m4 \
-	$(top_srcdir)/m4/socket.m4 $(top_srcdir)/m4/ulonglong.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/socket.m4 \
+	$(top_srcdir)/m4/triplet-transformation.m4 \
+	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -156,7 +157,8 @@ gawk_LDADD = $(LDADD)
 am__DEPENDENCIES_1 =
 gawk_DEPENDENCIES = support/libsupport.a $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -459,9 +461,8 @@ top_srcdir = @top_srcdir@
 # This variable insures that aclocal runs
 # correctly after changing configure.ac
 ACLOCAL_AMFLAGS = -I m4
-
-# This insures that make flags get passed down to child makes.
-AM_MAKEFLAGS = 'CFLAGS=$(CFLAGS)' 'LDFLAGS=$(LDFLAGS)'
+AM_CFLAGS = @CFLAGS@
+AM_LDFLAGS = @LDFLAGS@
 
 # Stuff to include in the dist that doesn't need it's own
 # Makefile.am files
@@ -498,7 +499,7 @@ EXTRA_DIST = \
 
 # Build in awklib after in doc, since we want to extract
 # sample files if doc/gawk.texi changed.
-SUBDIRS = support . $(am__append_1) extras doc awklib po test
+SUBDIRS = support . $(am__append_1) extras awklib po test
 include_HEADERS = gawkapi.h
 
 # sources for both gawk and dgawk
