@@ -185,18 +185,18 @@ dist-hook: pc/Makefile.tst
 
 # Special rules for individual files
 
-awkgram.c: awkgram.y
+$(srcdir)/awkgram.c: awkgram.y
 	$(YACC) -o $@ $(AM_YFLAGS) $(YFLAGS) $<
 	sed 's/parse error/syntax error/g' < $@ > $@.tmp && mv $@.tmp $@
 
-command.c: command.y
+$(srcdir)/command.c: command.y
 	$(YACC) -o $@ -p zz $<
 	sed 's/parse error/syntax error/g' < $@ > $@.tmp && mv $@.tmp $@
 
-pc/Makefile.tst: test/Makefile.in
-	test -d pc || mkdir pc
-	cat "$(top_srcdir)"/pc/Makefile.tst.prologue > pc/Makefile.tst
-	awk -f "$(top_srcdir)"/pc/GenMakefileTst.awk "$(top_srcdir)"/test/Makefile.in >> pc/Makefile.tst
+$(srcdir)/pc/Makefile.tst: test/Makefile.in pc/Makefile.tst.prologue pc/GenMakefileTst.awk
+	$(AM_V_GEN)$(MKDIR_P) "$(srcdir)"/pc && \
+	cat "$(srcdir)"/pc/Makefile.tst.prologue > "$(srcdir)"/pc/Makefile.tst && \
+	$(AWK) -f "$(srcdir)"/pc/GenMakefileTst.awk "$(srcdir)"/test/Makefile.in >> "$(srcdir)"/pc/Makefile.tst
 
 # This is for my development & testing.
 efence: gawk
