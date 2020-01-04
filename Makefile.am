@@ -27,8 +27,8 @@
 # correctly after changing configure.ac
 ACLOCAL_AMFLAGS = -I m4
 
-# This insures that make flags get passed down to child makes.
-AM_MAKEFLAGS = 'CFLAGS=$(CFLAGS)' 'LDFLAGS=$(LDFLAGS)'
+AM_CFLAGS = @CFLAGS@
+AM_LDFLAGS = @LDFLAGS@
 
 # Stuff to include in the dist that doesn't need it's own
 # Makefile.am files
@@ -200,7 +200,7 @@ pc/Makefile.tst: test/Makefile.in
 
 # This is for my development & testing.
 efence: gawk
-	$(CC) $(LDFLAGS) -o gawk $$(ls *.o | grep -v '_p.o$$') $(LDADD) $(LIBS) -lefence
+	$(CC) $(AM_LDFLAGS) -o gawk $$(ls *.o | grep -v '_p.o$$') $(LDADD) $(LIBS) -lefence
 
 diffout valgrind-scan:
 	@cd test && $(MAKE) $(AM_MAKEFLAGS) $@
