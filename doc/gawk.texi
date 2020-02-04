@@ -5425,7 +5425,7 @@ are processed.
 @cindex @code{\} (backslash) @subentry @code{\/} escape sequence
 @cindex backslash (@code{\}) @subentry @code{\/} escape sequence
 @item \/
-A literal slash (necessary for regexp constants only).
+A literal slash (should be used for regexp constants only).
 This sequence is used when you want to write a regexp
 constant that contains a slash
 (such as @code{/.*:\/home\/[[:alnum:]]+:.*/}; the @samp{[[:alnum:]]}
@@ -5437,7 +5437,7 @@ in order to tell @command{awk} to keep processing the rest of the regexp.
 @cindex @code{\} (backslash) @subentry @code{\"} escape sequence
 @cindex backslash (@code{\}) @subentry @code{\"} escape sequence
 @item \"
-A literal double quote (necessary for string constants only).
+A literal double quote (should be used for string constants only).
 This sequence is used when you want to write a string
 constant that contains a double quote
 (such as @code{"He said \"hi!\" to her."}).
@@ -17183,6 +17183,12 @@ which in turn come before all subarrays.
 (Subarrays have not been described yet;
 @pxref{Arrays of Arrays}.)
 
+If you choose to use this feature in traversing @code{FUNCTAB}
+(@pxref{Auto-set}), then the order is built-in functions first
+(@pxref{Built-in}), then user-defined functions (@pxref{User-defined})
+next, and finally functions loaded from an extension
+(@pxref{Dynamic Extensions}).
+
 @item "@@val_str_asc"
 Order by element values in ascending order (rather than by indices).  Scalar values are
 compared as strings.  Subarrays, if present, come out last.
@@ -18302,6 +18308,13 @@ a[1] = "first"
 a[2] = "last"
 a[3] = "middle"
 @end example
+
+@quotation NOTE
+Due to implementation limitations, you may not use either @code{SYMTAB}
+or @code{FUNCTAB} as arguments to these functions, even if providing a
+second array to use for the actual sorting.  Attempting to do so produces
+a fatal error.  This restriction may be lifted in the future.
+@end quotation
 
 @item @code{gensub(@var{regexp}, @var{replacement}, @var{how}} [@code{, @var{target}}]@code{) #}
 @cindexgawkfunc{gensub}

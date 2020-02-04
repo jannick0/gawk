@@ -3,7 +3,8 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2019 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2020,
+ * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -2270,6 +2271,8 @@ do_print(int nargs, int redirtype)
 		// Let force_string_ofmt handle checking if things
 		// are already valid.
 		args_array[i] = force_string_ofmt(tmp);
+		if (args_array[i] != tmp)
+			DEREF(tmp);
 	}
 
 	if (redir_exp != NULL) {
@@ -3236,6 +3239,7 @@ call_sub(const char *name, int nargs)
 			flags = GSUB;
 	}
 
+	bool need_free = false;
 	if (flags == 0 || flags == GSUB) {
 		/* sub or gsub */
 		if (nargs != 2)
@@ -3250,8 +3254,10 @@ call_sub(const char *name, int nargs)
 		 */
 		if ((regex->flags & REGEX) != 0)
 			regex = regex->typed_re;
-		else
+		else {
 			regex = make_regnode(Node_regex, regex);
+			need_free = true;
+		}
 		PUSH(regex);
 		PUSH(replace);
 		lhs = r_get_field(zero, (Func_ptr *) 0, true);
@@ -3277,8 +3283,10 @@ call_sub(const char *name, int nargs)
 		 */
 		if ((regex->flags & REGEX) != 0)
 			regex = regex->typed_re;
-		else
+		else {
 			regex = make_regnode(Node_regex, regex);
+			need_free = true;
+		}
 		PUSH(regex);
 		PUSH(replace);
 		PUSH(glob_flag);
@@ -3295,6 +3303,14 @@ call_sub(const char *name, int nargs)
 
 	unref(zero);
 	result = do_sub(nargs, flags);
+
+	if (need_free) {
+		refree(regex->re_reg[0]);
+		if (regex->re_reg[1] != NULL)
+			refree(regex->re_reg[1]);
+		freenode(regex);
+	}
+
 	if (flags != GENSUB)
 		reset_record();
 	return result;
@@ -3315,10 +3331,13 @@ call_match(int nargs)
 
 	/* Don't need to pop the string just to push it back ... */
 
+	bool need_free = false;
 	if ((regex->flags & REGEX) != 0)
 		regex = regex->typed_re;
-	else
+	else {
 		regex = make_regnode(Node_regex, regex);
+		need_free = true;
+	}
 
 	PUSH(regex);
 
@@ -3326,6 +3345,14 @@ call_match(int nargs)
 		PUSH(array);
 
 	result = do_match(nargs);
+
+	if (need_free) {
+		refree(regex->re_reg[0]);
+		if (regex->re_reg[1] != NULL)
+			refree(regex->re_reg[1]);
+		freenode(regex);
+	}
+
 	return result;
 }
 
@@ -3345,18 +3372,23 @@ call_split_func(const char *name, int nargs)
 	if (nargs == 4)
 		seps = POP();
 
+	bool need_free = false;
 	if (nargs >= 3) {
 		regex = POP_STRING();
 		if ((regex->flags & REGEX) != 0)
 			regex = regex->typed_re;
-		else
+		else {
 			regex = make_regnode(Node_regex, regex);
+			need_free = true;
+		}
 	} else {
 		if (name[0] == 's') {
 			regex = make_regnode(Node_regex, FS_node->var_value);
 			regex->re_flags |= FS_DFLT;
 		} else
 			regex = make_regnode(Node_regex, FPAT_node->var_value);
+
+		need_free = true;
 		nargs++;
 	}
 
@@ -3368,6 +3400,13 @@ call_split_func(const char *name, int nargs)
 		PUSH(seps);
 
 	result = (name[0] == 's') ? do_split(nargs) : do_patsplit(nargs);
+
+	if (need_free) {
+		refree(regex->re_reg[0]);
+		if (regex->re_reg[1] != NULL)
+			refree(regex->re_reg[1]);
+		freenode(regex);
+	}
 
 	return result;
 }
@@ -4121,6 +4160,7 @@ do_typeof(int nargs)
 		}
 		break;
 	case Node_var_new:
+	case Node_array_ref:
 		res = "untyped";
 		deref = false;
 		break;

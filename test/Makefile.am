@@ -1,7 +1,7 @@
 #
 # test/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1988-2019 the Free Software Foundation, Inc.
+# Copyright (C) 1988-2020 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -961,6 +961,8 @@ EXTRA_DIST = \
 	profile12.awk \
 	profile12.in \
 	profile12.ok \
+	profile13.awk \
+	profile13.ok \
 	prt1eval.awk \
 	prt1eval.ok \
 	prtoeval.awk \
@@ -1172,6 +1174,14 @@ EXTRA_DIST = \
 	strtonum.ok \
 	strtonum1.awk \
 	strtonum1.ok \
+	stupid1.awk \
+	stupid1.ok \
+	stupid2.awk \
+	stupid2.ok \
+	stupid3.awk \
+	stupid3.ok \
+	stupid4.awk \
+	stupid4.ok \
 	subamp.awk \
 	subamp.in \
 	subamp.ok \
@@ -1216,6 +1226,8 @@ EXTRA_DIST = \
 	symtab10.awk \
 	symtab10.in \
 	symtab10.ok \
+	symtab11.awk \
+	symtab11.ok \
 	synerr1.awk \
 	synerr1.ok \
 	synerr2.awk \
@@ -1385,13 +1397,15 @@ GAWK_EXT_TESTS = \
 	nsbad nsbad_cmd nsforloop nsfuncrecurse nsindirect1 nsindirect2 nsprof1 nsprof2 \
 	patsplit posix printfbad1 printfbad2 printfbad3 printfbad4 printhuge \
 	procinfs profile0 profile1 profile2 profile3 profile4 profile5 profile6 \
-	profile7 profile8 profile9 profile10 profile11 profile12 pty1 pty2 \
+	profile7 profile8 profile9 profile10 profile11 profile12 profile13 pty1 pty2 \
 	rebuf regnul1 regnul2 regx8bit reginttrad reint reint2 rsgetline rsglstdin \
 	rsstart1 rsstart2 rsstart3 rstest6 \
 	sandbox1 shadow shadowbuiltin sortfor sortfor2 sortu \
 	sourcesplit split_after_fpat \
-	splitarg4 strftfld strftime strtonum strtonum1 switch2 symtab1 symtab2 \
-	symtab3 symtab4 symtab5 symtab6 symtab7 symtab8 symtab9 symtab10 \
+	splitarg4 strftfld strftime strtonum strtonum1 \
+	stupid1 stupid2 stupid3 stupid4 \
+	switch2 symtab1 symtab2 symtab3 symtab4 symtab5 symtab6 symtab7 \
+	symtab8 symtab9 symtab10 symtab11 \
 	timeout typedregex1 typedregex2 typedregex3 typedregex4 \
 	typedregex5 typedregex6 \
 	typeof1 typeof2 typeof3 typeof4 typeof5 \
@@ -1445,7 +1459,7 @@ NEED_POSIX = escapebrace printf0 posix2008sub paramasfunc1 paramasfunc2 muldimpo
 
 # List of tests that need --pretty-print
 NEED_PRETTY = nsprof1 nsprof2 \
-	profile4 profile5 profile8 profile9 profile10 profile11
+	profile4 profile5 profile8 profile9 profile10 profile11 profile13
 
 # List of tests that need --re-interval
 NEED_RE_INTERVAL = gsubtst3 reint reint2
