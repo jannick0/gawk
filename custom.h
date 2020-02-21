@@ -48,7 +48,7 @@
 #define _GNU_SOURCE 1
 #endif /* _GNU_SOURCE */
 #ifndef SIZE_MAX
-#define SIZE_MAX __INT32_MAX
+#define SIZE_MAX (__UINT32_MAX)
 #endif /* SIZE_MAX */
 #define ULONG_WIDTH 32
 #ifndef __VAX
@@ -95,3 +95,5 @@ typedef unsigned long long uint_fast64_t;
 #else
 # define _GL_ATTRIBUTE_PURE /* empty */
 #endif
+
+#include "mbsupport.h" /* defines stuff for DJGPP to fake MBS */
