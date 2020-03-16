@@ -11,25 +11,12 @@ script:
   - export msys2+=" -msys2 -c "\"\$@"\" --"
   - $msys2 pacman --sync --noconfirm --needed base base-devel msys2-devel mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
   - export PATH=/C/tools/msys64/usr/bin:$PATH
-  - echo $PATH
-  - bash --version
-  - command -v bash
-  - mkdir -p bld-m1
-  - cd bld-m1
-  - pwd
-  - ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
-  - make
-  - make check
-  - cd ..
-  - pwd
-  - autoreconf -vfi
-  - mkdir -p bld-m2
-  - cd bld-m2
-  - pwd
-  - ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
-  - make
-  - make check
-  - make distcheck
+  - $msys2 echo $PATH
+  - $msys2 bash --version
+  - $msys2 command -v bash
+  - $msys2 mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
+  - $msys2 autoreconf -vfi
+  - $msys2 mkdir -p bld-m2 && cd bld-m2 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
 
 before_cache:
 - |-
