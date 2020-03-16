@@ -1,7 +1,7 @@
 os: windows
 language: bash
 
-before_install:
+before_script:
 - |-
     case $TRAVIS_OS_NAME in
       windows)
@@ -12,23 +12,21 @@ before_install:
         export msys2+='& set MSYS=winsymlinks:nativestrict '
         export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
         export msys2+=" -msys2 -c "\"\$@"\" --"
-        $msys2 pacman --sync --noconfirm --needed base base-devel sh mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
-        taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+        $msys2 pacman --sync --noconfirm --needed base base-devel which sh
         export PATH=/C/tools/msys64/usr/bin:$PATH
-        export MAKE=make  # so that Autotools can find it
+        pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
+        taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
         ;;
     esac
 
 script:
   - echo $PATH
-  - which bash
-  - which sh
   - bash --version
-  - sh --version
+  - which bash
   - mkdir -p bld-m1
   - cd bld-m1
   - pwd
-  - ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
+  - sh ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
   - make
   - make check
   - cd ..
