@@ -12,7 +12,7 @@ before_script:
         export msys2+='& set MSYS=winsymlinks:nativestrict '
         export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
         export msys2+=" -msys2 -c "\"\$@"\" --"
-        $msys2 pacman --sync --noconfirm --needed base base-devel which sh
+        $msys2 "pacman --sync --noconfirm --needed base base-devel which sh"
         export PATH=/C/tools/msys64/usr/bin:$PATH
         $msys2 pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
         #taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
