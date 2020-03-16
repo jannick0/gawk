@@ -9,11 +9,11 @@ script:
   - export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start -msys2 '
   - export msys2+=' -c "$@"'
   - export PATH=/C/tools/msys64/usr/bin:$PATH
-  - export msys2='PATH=$PATH /c/tools/msys64/usr/bin/bash -c "$@"'
+  - export msys2='/c/tools/msys64/msys2_shell.cmd -defterm -full-path -no-start -msys2 -c "$@"'
   - echo $PATH
   - echo "/c/tools/msys64/msys2_shell.cmd -defterm -msys2 -here -full-path -no-start"
-  - PATH=/c/tools/msys64/usr/bin /c/tools/msys64/usr/bin/bash -c 'pacman --sync --noconfirm --needed base base-devel msys2-devel'
-  - bash -c 'pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel'
+  - $msys2 pacman --sync --noconfirm --needed base base-devel msys2-devel
+  - $msys2 pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
   - $msys2 mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
   - $msys2 autoreconf -vfi
   - $msys2 mkdir -p bld-m2 && cd bld-m2 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
