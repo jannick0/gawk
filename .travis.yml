@@ -20,9 +20,9 @@ before_install:
     esac
 
 script:
-  - $msys2 echo $PATH
-  - $msys2 mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check
-  - $msys2 autoreconf -vfi && mkdir -p bld-m2 && cd bld-m2 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && make distcheck
+  - echo $PATH
+  - mkdir -p bld-m1 && cd bld-m1 && sh ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check
+  - autoreconf -vfi && mkdir -p bld-m2 && cd bld-m2 && sh ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && make distcheck
 
 before_cache:
 - |-
