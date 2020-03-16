@@ -2,7 +2,7 @@ os: windows
 language: bash
 
 before_install:
-  - >
+- |-
     case $TRAVIS_OS_NAME in
       windows)
         [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64
@@ -22,7 +22,7 @@ script:
   - $msys2 autoreconf -vfi && mkdir -p bld-m2 && cd bld-m2 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && make distcheck
 
 before_cache:
-  - >
+- |-
     case $TRAVIS_OS_NAME in
       windows)
         # https://unix.stackexchange.com/a/137322/107554
