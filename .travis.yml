@@ -24,8 +24,22 @@ script:
   - which sh
   - bash --version
   - sh --version
-  - sh 'mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check'
-  - sh 'autoreconf -vfi && mkdir -p bld-m2 && cd bld-m2 && sh ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && make distcheck'
+  - mkdir -p bld-m1
+  - cd bld-m1
+  - pwd
+  - ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
+  - make
+  - make check
+  - cd ..
+  - pwd
+  - autoreconf -vfi
+  - mkdir -p bld-m2
+  - cd bld-m2
+  - pwd
+  - ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
+  - make
+  - make check
+  - make distcheck
 
 before_cache:
 - |-
