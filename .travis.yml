@@ -2,20 +2,18 @@ os: windows
 language: bash
 
 script:
-  - choco uninstall -y mingw
   - test ! -f C:/tools/msys64/msys2_shell.cmd && rm -rf /C/tools/msys64
   - choco upgrade --no-progress -y msys2
   - export msys2='cmd //C RefreshEnv.cmd '
   - export msys2+='& set MSYS=winsymlinks:nativestrict '
   - export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
-  - export msys2+=' -msys2 -c "$@" --'
+  - export msys2+=' -msys2 -c "$@"'
   - $msys2 pacman --sync --noconfirm --needed base base-devel msys2-devel
   - export PATH=/C/tools/msys64/usr/bin:$PATH
-  - $msys2 pacman -Syuu --noconfirm --needed
-  - pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
-  - mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
-  - autoreconf -vfi
-  - mkdir -p bld-m2 && cd bld-m2 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
+  - $msys2 pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
+  - $msys2 mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
+  - $msys2 autoreconf -vfi
+  - $msys2 mkdir -p bld-m2 && cd bld-m2 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
 
 before_cache:
 - |-
