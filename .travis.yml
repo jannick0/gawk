@@ -8,7 +8,7 @@ script:
   - export msys2='cmd //C RefreshEnv.cmd '
   - export msys2+='& set MSYS=winsymlinks:nativestrict '
   - export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
-  - export msys2+=" -msys2 -c "\"\$@"\" --"
+  - export msys2+=' -msys2 -c "$@" --'
   - $msys2 pacman --sync --noconfirm --needed base base-devel msys2-devel mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
   - export PATH=/C/tools/msys64/usr/bin:$PATH
   - $msys2 echo $PATH
@@ -22,8 +22,7 @@ before_cache:
 - |-
     case $TRAVIS_OS_NAME in
       windows)
-        # https://unix.stackexchange.com/a/137322/107554
-        $msys2 pacman --sync --clean --noconfirm
+        $msys2 paccache -rk0
         ;;
     esac
 
