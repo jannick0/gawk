@@ -1,4 +1,5 @@
 os: windows
+language: bash
 
 before_install:
   - >
