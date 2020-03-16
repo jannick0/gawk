@@ -9,9 +9,9 @@ script:
   - export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
   - export msys2+=' -msys2 -c "$@"'
   - export PATH=/C/tools/msys64/usr/bin:$PATH
-  - export MSYSTEM=MSYS
-  - /c/tools/msys64/msys2_shell.cmd -defterm -msys2 -here -full-path -no-start
-  - pacman --sync --noconfirm --needed base base-devel msys2-devel
+  - echo $PATH
+  - echo "/c/tools/msys64/msys2_shell.cmd -defterm -msys2 -here -full-path -no-start"
+  - /C/tools/msys64/usr/bin/pacman --sync --noconfirm --needed base base-devel msys2-devel
   - pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel
   - mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check && cd ..
   - autoreconf -vfi
