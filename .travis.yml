@@ -6,27 +6,27 @@ matrix:
     - os: windows
 
 before_script:
-  - |-
-      if test $TRAVIS_OS_NAME = windows
-      then
-        ! test -f C:/tools/msys64/msys2_shell.cmd && rm -rf /C/tools/msys64
-        choco upgrade --no-progress -y msys2
-        myshell() { /c/tools/msys64/msys2_shell.cmd -msys -defterm -no-start -here -c "$1"; }
-        myshell "pacman --sync --noconfirm --needed base base-devel msys2-devel"
-        myshell "pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel"
-      else
-        myshell() { bash -c "$1" }
-      fi
+- env | sort
+- |-
+    if test $TRAVIS_OS_NAME = windows; then
+      ! test -f C:/tools/msys64/msys2_shell.cmd && rm -rf /C/tools/msys64
+      choco upgrade --no-progress -y msys2
+      myshell() { /c/tools/msys64/msys2_shell.cmd -msys -defterm -no-start -here -c "$1"; }
+      myshell "pacman --sync --noconfirm --needed base base-devel msys2-devel"
+      myshell "pacman --sync --noconfirm --needed mpfr libintl libreadline gettext-devel mpfr-devel libreadline-devel"
+    else
+      myshell() { bash -c "$1" }
+    fi
 
 script:
-  - myshell "mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check"
-  - myshell "autoreconf -vfi"
-  - myshell "mkdir -p bld-m2 && cd bld-m2 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check"
+- myshell "mkdir -p bld-m1 && cd bld-m1 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check"
+- myshell "autoreconf -vfi"
+- myshell "mkdir -p bld-m2 && cd bld-m2 && ../configure --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv && make && make check"
 
 before_cache:
-  - test x$TRAVIS_OS_NAME = xwindows && myshell "paccache -rk0"
+- test x$TRAVIS_OS_NAME = xwindows && myshell "paccache -rk0"
 
 cache:
-    directories:
-    - $HOME/AppData/Local/Temp/chocolatey
-    - /C/tools/msys64
+  directories:
+  - $HOME/AppData/Local/Temp/chocolatey
+  - /C/tools/msys64
