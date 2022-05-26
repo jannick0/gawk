@@ -1,0 +1,26 @@
+name: Update repo from Savannah upstream
+on:
+  workflow_dispatch:
+  schedule:
+    # run every Saturday
+    - cron: "0 0 * * 6"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: master
+          fetch-depth: 0
+      - name: Merge Savannah repo to master
+        run: |
+          echo 'Show remote repos:'
+          git remote -v
+          git remote add upstream 'https://git.savannah.gnu.org/git/gawk.git'
+          echo 'Show remote repos again:'
+          git remote -v
+          git fetch upstream
+          git merge 'upstream/master'
+          git push
