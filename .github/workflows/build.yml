@@ -1,0 +1,165 @@
+name: build and check
+
+on:
+  push:
+    branches-ignore:
+      - workflow
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-check-msys2:
+    strategy:
+      fail-fast: false
+      matrix:
+        system: [MSYS, MINGW32, MINGW64, CLANG32, CLANG64]
+
+    name: ${{ matrix.system }}
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Prepare MSYS2 system
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.system }}
+          install: git base-devel autotools pactoys
+          update: true
+          path-type: minimal
+
+      # Unfortunately the required packages cannot be passed through the
+      # previous step using 'install' and 'pacboy' given that both systems
+      # MSYS and non-MSYS are run
+      - name: Install packages
+        run: |
+          case "$MSYSTEM" in
+            (MSYS) pacman -S --noconfirm --needed gcc gettext-devel libreadline-devel mpfr-devel ;;
+            (*)    pacboy -S --noconfirm --needed gcc:p gettext:p make:p mpfr:p readline:p ;;
+          esac
+
+      - name: Configure system
+        run: |
+          # get version string from git repo
+          git_version=$(git describe --dirty --tags)
+          echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
+
+          ./bootstrap.sh
+
+          # prepare build system
+          case "$MSYSTEM" in
+            (MSYS) autoreconf -vfi
+                  # we prefer to test a VPATH build
+                  mkdir -p build
+                  cd build
+                  ../configure -C
+                  cat config.log
+                  cat config.cache
+                  ;;
+            (*) cp -v pc/{Makefile,*.h,*.c,testoutcmp.awk} .
+                cp -v pc/Makefile.ext ./extension/Makefile
+                cp -v pc/Makefile.tst ./test/Makefile
+                  ;;
+          esac
+
+      - name: Build gawk app and extensions
+        run: |
+          case "$MSYSTEM" in
+            (MSYS)  cd build
+                    make V=0 || { ret=$?; make V=1; cat config.log; cat config.cache; exit $ret; }
+                  ;;
+            (*) mingw32-make mingw32-readline-mpfr USER_CFLAGS='-D_NO_BOOL_TYPEDEF -pedantic'
+                make -C extension extensions
+                ;;
+          esac
+
+      - name: Run checks
+        run: |
+          case "$MSYSTEM" in
+            (MSYS) make -C build check;;
+            (*) LC_ALL=C LC_LOCALE=C make -C test check;;
+          esac
+
+      - name: Run distcheck (autoconf only)
+        if: ${{ matrix.system }} == 'MSYS'
+        run: make -C build distcheck
+
+
+  build-check-unix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Configure
+        run: |
+          # install optional packages and set configure flags
+          pkgs='autoconf automake libtool gettext coreutils gawk grep perl'
+          configure_flags=''
+          case '${{ matrix.os }}' in
+            (ubuntu-*) sudo apt-get update
+                    sudo apt-get install $pkgs autopoint sed
+                    # separate install checks
+                    if ! sudo apt-get install libmpfr-dev; then
+                      configure_flags="$configure_flags --disable-mpfr"
+                    fi
+                    if ! sudo apt-get install libeditreadline-dev; then
+                      configure_flags="$configure_flags --disable-readline"
+                    fi
+                    ;;
+            (macos-*)  # NB mpfr and readline installed per default
+                    brew update
+                    brew upgrade
+                    brew install autoconf automake libtool gettext coreutils gawk grep gnu-sed pkg-config
+                    # make the app versions without leading character 'g' available on PATH
+                    for p in coreutils grep gnu-sed; do
+                      export PATH="/usr/local/opt/$p/libexec/gnubin:$PATH"
+                    done
+                    # ... and make the extended PATH available to subsequent steps
+                    echo "PATH=$PATH" >> "$GITHUB_ENV"
+                    # separate install checks
+                     ;;
+          esac
+
+          # get version string from git repo
+          git_version=$(git describe --dirty --tags)
+          echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
+
+          ./bootstrap.sh
+
+          # prepare build system
+          autoreconf -vfi
+          # we prefer to test a VPATH build
+          mkdir -p build
+          cd build
+          ../configure -C "$configure_flags"
+          cat config.log
+          cat config.cache
+
+      - name: Build gawk app and extensions
+        run: make V=0 || { ret=$?; make V=1; cat config.log; cat config.cache; exit $ret; }
+        working-directory: build
+
+      - name: Run checks
+        run: make check
+        working-directory: build
+
+      - name: Run distcheck
+        run: make distcheck || { ret=$?; cat config.log; cat config.cache; exit $ret; }
+        working-directory: build
