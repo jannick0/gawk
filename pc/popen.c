@@ -170,7 +170,7 @@ kill (int pid, int sig)
   ph = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
   if (ph)
     {
-      BOOL status = TerminateProcess(ph, -1);
+      WINBOOL status = TerminateProcess(ph, -1);
 
       if (!status)
 	{
