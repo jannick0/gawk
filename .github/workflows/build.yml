@@ -74,7 +74,11 @@ jobs:
             (MSYS)  cd build
                     make V=0 || { ret=$?; make V=1; cat config.log; cat config.cache; exit $ret; }
                   ;;
-            (*) mingw32-make mingw32-readline-mpfr USER_CFLAGS='-D_NO_BOOL_TYPEDEF -pedantic'
+            (*) MYCFLAGS='-pedantic -Wall'
+                # MinGW-specifics: do not define type BOOL, because GAWK no infringes the Windows name space
+                # cf. https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/minwindef.h#l130
+                MYCFLAGS="$MYCFLAGS -D_NO_BOOL_TYPEDEF"
+                mingw32-make mingw32-readline-mpfr MYCFLAGS="$MYCFLAGS"
                 make -C extension extensions
                 ;;
           esac
@@ -110,11 +114,10 @@ jobs:
       - name: Configure
         run: |
           # install optional packages and set configure flags
-          pkgs='autoconf automake libtool gettext coreutils gawk grep perl'
           configure_flags=''
           case '${{ matrix.os }}' in
             (ubuntu-*) sudo apt-get update
-                    sudo apt-get install $pkgs autopoint sed
+                    sudo apt-get install gettext autopoint
                     # separate install checks
                     if ! sudo apt-get install libmpfr-dev; then
                       configure_flags="$configure_flags --disable-mpfr"
@@ -122,11 +125,14 @@ jobs:
                     if ! sudo apt-get install libeditreadline-dev; then
                       configure_flags="$configure_flags --disable-readline"
                     fi
+                    # fingers crossed that this upgrades all packages to the highest version available
+                    sudo apt update
+                    sudo apt-get upgrade
                     ;;
             (macos-*)  # NB mpfr and readline installed per default
                     brew update
                     brew upgrade
-                    brew install autoconf automake libtool gettext coreutils gawk grep gnu-sed pkg-config
+                    brew install automake gettext coreutils gawk grep gnu-sed
                     # make the app versions without leading character 'g' available on PATH
                     for p in coreutils grep gnu-sed; do
                       export PATH="/usr/local/opt/$p/libexec/gnubin:$PATH"
@@ -134,23 +140,34 @@ jobs:
                     # ... and make the extended PATH available to subsequent steps
                     echo "PATH=$PATH" >> "$GITHUB_ENV"
                     # separate install checks
-                     ;;
+                    ;;
           esac
+          echo "configure_flags='$configure_flags'"
 
           # get version string from git repo
           git_version=$(git describe --dirty --tags)
           echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
 
+          # boostrap
           ./bootstrap.sh
 
           # prepare build system
-          autoreconf -vfi
+          ## May 2022: this hack is needed since apt-get on Ubuntu provides
+          ## gettext-0.19.8 only, while configure.ac requires a higher version.
+          case '${{ matrix.os }}' in
+            (ubuntu-*)
+              dpkg -s gettext
+            ;;
+            (*) autoreconf -vfi
+          esac
           # we prefer to test a VPATH build
           mkdir -p build
           cd build
-          ../configure -C "$configure_flags"
-          cat config.log
-          cat config.cache
+          ../configure -C $configure_flags
+          for e in log cache; do
+            echo "'config.$e':"
+            cat "config.$e"
+          done
 
       - name: Build gawk app and extensions
         run: make V=0 || { ret=$?; make V=1; cat config.log; cat config.cache; exit $ret; }
