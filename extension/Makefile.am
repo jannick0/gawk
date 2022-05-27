@@ -111,7 +111,7 @@ time_la_LIBADD        = $(MY_LIBS)
 # an installation path.
 testext_la_SOURCES    = testext.c
 testext_la_LDFLAGS    = $(MY_MODULE_FLAGS) -rpath /foo
-testext_la_LIBADD     = $(MY_LIBS)
+testext_la_LIBADD     = $(MY_LIBS) $(LIBMPFR)
 
 # N.B. Because we are not installing readdir_test, we must specify -rpath in
 # LDFLAGS to get automake to build a shared library, since it needs
