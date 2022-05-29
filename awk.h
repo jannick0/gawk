@@ -73,6 +73,9 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <signal.h>
+#ifndef HAVE_STRSIGNAL
+char *strsignal(int sig);
+#endif
 #include <time.h>
 #include <errno.h>
 #if ! defined(errno)

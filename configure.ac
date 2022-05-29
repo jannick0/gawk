@@ -171,7 +171,7 @@ gt_LC_MESSAGES
 
 dnl checks for header files
 AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h \
-	netdb.h netinet/in.h stddef.h string.h \
+	netdb.h netinet/in.h signal.h stddef.h string.h \
 	sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/time.h unistd.h \
 	termios.h stropts.h wchar.h wctype.h)
 
@@ -311,7 +311,7 @@ AC_CHECK_FUNCS(__etoa_l atexit btowc fmod gai_strerror \
 	memset_ulong mkstemp mtrace \
 	posix_openpt setenv setlocale setsid sigprocmask \
 	snprintf strchr \
-	strerror strftime strcasecmp strncasecmp strcoll strtod strtoul \
+	strerror strftime strcasecmp strncasecmp strcoll strsignal strtod strtoul \
 	system timegm tmpfile towlower towupper tzset usleep waitpid wcrtomb \
 	wcscoll wctype)
 dnl this check is for both mbrtowc and the mbstate_t type, which is good

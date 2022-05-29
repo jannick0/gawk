@@ -183,6 +183,9 @@
 /* Define to 1 if you have the `setsid' function. */
 #undef HAVE_SETSID
 
+/* Define to 1 if you have the <signal.h> header file. */
+#undef HAVE_SIGNAL_H
+
 /* Define to 1 if you have the `sigprocmask' function. */
 #undef HAVE_SIGPROCMASK
 
@@ -239,6 +242,9 @@
 
 /* Define to 1 if you have the <stropts.h> header file. */
 #undef HAVE_STROPTS_H
+
+/* Define to 1 if you have the `strsignal' function. */
+#undef HAVE_STRSIGNAL
 
 /* Define to 1 if you have the `strtod' function. */
 #undef HAVE_STRTOD
