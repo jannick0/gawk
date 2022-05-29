@@ -12,9 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        system: [MSYS, MINGW32, MINGW64, CLANG32, CLANG64]
+        msystem: [MSYS, MINGW32, MINGW64, CLANG32, CLANG64]
 
-    name: ${{ matrix.system }}
+    name: ${{ matrix.msystem }}
     runs-on: windows-latest
     defaults:
       run:
@@ -29,7 +29,7 @@ jobs:
       - name: Prepare MSYS2 system
         uses: msys2/setup-msys2@v2
         with:
-          msystem: ${{ matrix.system }}
+          msystem: ${{ matrix.msystem }}
           install: git base-devel autotools pactoys
           update: true
           path-type: minimal
@@ -58,7 +58,7 @@ jobs:
                   # we prefer to test a VPATH build
                   mkdir -p build
                   cd build
-                  ../configure -C
+                  ../configure -C --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
                   cat config.log
                   cat config.cache
                   ;;
@@ -91,7 +91,7 @@ jobs:
           esac
 
       - name: Run distcheck (autoconf only)
-        if: ${{ matrix.system }} == 'MSYS'
+        if: ${{ matrix.msystem }} == 'MSYS'
         run: make -C build distcheck
 
 
@@ -178,5 +178,6 @@ jobs:
         working-directory: build
 
       - name: Run distcheck
+        if: ${{ matrix.msystem }}  == 'MSYS'
         run: make distcheck || { ret=$?; cat config.log; cat config.cache; exit $ret; }
         working-directory: build
