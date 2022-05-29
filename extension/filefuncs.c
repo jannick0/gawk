@@ -106,15 +106,33 @@
 #endif
 
 #ifdef __MINGW32__
+#ifndef S_IRGRP
 #define S_IRGRP S_IRUSR
+#endif
+#ifndef S_IWGRP
 #define S_IWGRP S_IWUSR
+#endif
+#ifndef S_IXGRP
 #define S_IXGRP S_IXUSR
+#endif
+#ifndef S_IROTH
 #define S_IROTH S_IRUSR
+#endif
+#ifndef S_IWOTH
 #define S_IWOTH S_IWUSR
+#endif
+#ifndef S_IXOTH
 #define S_IXOTH S_IXUSR
+#endif
+#ifndef S_ISUID
 #define S_ISUID 0
+#endif
+#ifndef S_ISGID
 #define S_ISGID 0
+#endif
+#ifndef S_ISVTX
 #define S_ISVTX 0
+#endif
 #define major(s) (s)
 #define minor(s) (0)
 
