@@ -49,6 +49,7 @@ jobs:
           # get version string from git repo
           git_version=$(git describe --dirty --tags)
           echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
+          echo "GAWK_GIT_VERSION='$git_version'" >> $GITHUB_ENV
 
           ./bootstrap.sh
 
@@ -91,8 +92,11 @@ jobs:
           esac
 
       - name: Run distcheck (autoconf only)
-        if: ${{ matrix.msystem }} == 'MSYS'
-        run: make -C build distcheck
+        run: |
+          case "$MSYSTEM" in
+            (MSYS) make distcheck DISTCHECK_CONFIGURE_FLAGS="--without-libiconv-prefix --without-libintl-prefix --without-libsigsegv";;
+          esac
+        working-directory: build
 
 
   build-check-unix:
@@ -111,7 +115,7 @@ jobs:
           ref: master
           fetch-depth: 0
 
-      - name: Configure
+      - name: Install packages
         run: |
           # install optional packages and set configure flags
           configure_flags=''
@@ -143,10 +147,14 @@ jobs:
                     ;;
           esac
           echo "configure_flags='$configure_flags'"
+          echo "GAWK_CONFIGURE_FLAGS='$configure_flags'" >> $GITHUB_ENV
 
+      - name: Configure
+        run: |
           # get version string from git repo
           git_version=$(git describe --dirty --tags)
           echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
+          echo "GAWK_GIT_VERSION='$git_version'" >> $GITHUB_ENV
 
           # boostrap
           ./bootstrap.sh
@@ -163,7 +171,7 @@ jobs:
           # we prefer to test a VPATH build
           mkdir -p build
           cd build
-          ../configure -C $configure_flags
+          ../configure -C $GAWK_CONFIGURE_FLAGS
           for e in log cache; do
             echo "'config.$e':"
             cat "config.$e"
@@ -178,6 +186,5 @@ jobs:
         working-directory: build
 
       - name: Run distcheck
-        if: ${{ matrix.msystem }}  == 'MSYS'
         run: make distcheck || { ret=$?; cat config.log; cat config.cache; exit $ret; }
         working-directory: build
