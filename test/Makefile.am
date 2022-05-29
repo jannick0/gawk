@@ -2529,7 +2529,7 @@ indirectbuiltin2:
 	@echo $@
 	@-for test in 0 1 2 3 4 5 ; do \
 	$(AWK) -v test=$$test -f "$(srcdir)"/$@.awk ; \
-	done > _$@ 2>&1 || exit 0
+	done 2>&1 | $(AWK) '/: fatal:/ {sub(/^[^ ]+\//,"./",$$2)} 1' > _$@ || exit 0
 	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 
 # Targets generated for other tests:
