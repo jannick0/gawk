@@ -2180,7 +2180,7 @@ ordchr2::
 readfile::
 	@echo $@
 	@-$(AWK) -l readfile 'BEGIN {printf "%s", readfile("$(srcdir)/Makefile.am")}' >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@
-	@-$(CMP) "$(srcdir)/Makefile.am" _$@ && rm -f _$@ || cp -p "$(srcdir)/Makefile.am" $@.ok
+	@-$(CMP) "$(srcdir)/Makefile.am" _$@ && rm -f _$@ || cp -p "$(srcdir)/Makefile.am" "$(srcdir)"/$@.ok
 
 readfile2::
 	@echo $@
@@ -2349,7 +2349,7 @@ readall:
 	@echo $@
 	@-$(AWK) -lrwarray -f "$(srcdir)"/$@1.awk -v "ofile=readall.state" > _$@
 	@-$(AWK) -lrwarray -f "$(srcdir)"/$@2.awk -v "ifile=readall.state" >> _$@
-	@-$(CMP) $@.ok _$@ && rm -f _$@
+	@-$(CMP) "$(srcdir)"/$@.ok _$@ && rm -f _$@
 	@-$(RM) -f readall.state
 
 fts:
