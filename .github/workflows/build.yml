@@ -94,9 +94,9 @@ jobs:
       - name: Run distcheck (autoconf only)
         run: |
           case "$MSYSTEM" in
-            (MSYS) make distcheck DISTCHECK_CONFIGURE_FLAGS="--without-libiconv-prefix --without-libintl-prefix --without-libsigsegv";;
+            (MSYS) make -C build distcheck DISTCHECK_CONFIGURE_FLAGS="--without-libiconv-prefix --without-libintl-prefix --without-libsigsegv";;
+            (*) exit 0;;
           esac
-        working-directory: build
 
 
   build-check-unix:
@@ -167,11 +167,12 @@ jobs:
               dpkg -s gettext
             ;;
             (*) autoreconf -vfi
+            ;;
           esac
           # we prefer to test a VPATH build
           mkdir -p build
           cd build
-          ../configure -C $GAWK_CONFIGURE_FLAGS
+          ../configure --build=$(gcc -dumpmachine) -C $GAWK_CONFIGURE_FLAGS
           for e in log cache; do
             echo "'config.$e':"
             cat "config.$e"
@@ -186,5 +187,5 @@ jobs:
         working-directory: build
 
       - name: Run distcheck
-        run: make distcheck || { ret=$?; cat config.log; cat config.cache; exit $ret; }
+        run: make distcheck DISTCHECK_CONFIGURE_FLAGS="--build=$(gcc -dumpmachine) -C $GAWK_CONFIGURE_FLAGS" || { ret=$?; cat config.log; cat config.cache; exit $ret; }
         working-directory: build
