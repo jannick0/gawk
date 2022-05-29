@@ -19,6 +19,9 @@
 
 #ifdef __CYGWIN__
 #include <io.h>		/* for declaration of setmode(). */
+#define _NO_BOOL_TYPEDEF
+#include <windows.h>
+#include <sys/cygwin.h>
 #endif
 
 const char quote = '\'';
