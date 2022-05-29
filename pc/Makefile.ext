@@ -49,7 +49,7 @@ readdir_test.$(SOEXT): readdir.c gawkdirfd.h
 	gcc -I.. -DHAVE_DIRENT_H -shared -gdwarf-2 -g3 -static-libgcc -o $@ readdir_test.c
 
 rwarray.$(SOEXT): rwarray.c
-	gcc -I.. -shared -gdwarf-2 -g3 -static-libgcc -o $@ rwarray.c -lws2_32
+	gcc -I.. $(MPFR) -shared -gdwarf-2 -g3 -static-libgcc -o $@ rwarray.c $(MPFR_LIBS) -lws2_32
 
 filefuncs.$(SOEXT): filefuncs.c stack.c stack.h gawkfts.h
 	gcc -I.. -shared -gdwarf-2 -g3 -static-libgcc -o $@ filefuncs.c stack.c
