@@ -254,7 +254,7 @@ GAWKOBJS = $(ALLOBJS) $(LIBOBJS)
 .SUFFIXES: .c $O
 
 .c$O:
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(MYCFLAGS) $(CFLAGS) $<
 
 # rules to build gawk
 all : gawk.exe
