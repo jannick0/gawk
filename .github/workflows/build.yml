@@ -162,6 +162,7 @@ jobs:
         run: |
           # get version string from git repo
           git_version=$(git describe --dirty --tags)
+          echo "GIT version: '$git_version'."
           echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
           echo "GAWK_GIT_VERSION='$git_version'" >> $GITHUB_ENV
 
@@ -172,16 +173,16 @@ jobs:
           ## May 2022: this hack is needed since apt-get on Ubuntu provides
           ## gettext-0.19.8 only, while configure.ac requires a higher version.
           case '${{ matrix.os }}' in
-            (ubuntu-*)
-              dpkg -s gettext
-            ;;
+            #(ubuntu-*)
+            #  dpkg -s gettext
+            #;;
             (*) autoreconf -vfi
             ;;
           esac
           # we prefer to test a VPATH build
           mkdir -p build
           cd build
-          ../configure --build=$(gcc -dumpmachine) -C $GAWK_CONFIGURE_FLAGS
+          ../configure -C $GAWK_CONFIGURE_FLAGS
           for e in log cache; do
             echo "'config.$e':"
             cat "config.$e"
