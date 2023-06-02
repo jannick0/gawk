@@ -54,6 +54,7 @@ jobs:
       - name: Configure system
         run: |
           # get version string from git repo
+          echo "git version: '$(git describe)'"
           git_version=$(git describe --dirty --tags)
           echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
           echo "GAWK_GIT_VERSION='$git_version'" >> $GITHUB_ENV
@@ -133,10 +134,10 @@ jobs:
                     sudo apt-get install gettext autopoint
                     # separate install checks
                     if ! sudo apt-get install libmpfr-dev; then
-                      configure_flags="$configure_flags --disable-mpfr"
+                      configure_flags+" --disable-mpfr"
                     fi
                     if ! sudo apt-get install libeditreadline-dev; then
-                      configure_flags="$configure_flags --disable-readline"
+                      configure_flags+=" --disable-readline"
                     fi
                     # fingers crossed that this upgrades all packages to the highest version available
                     sudo apt update
@@ -162,7 +163,7 @@ jobs:
         run: |
           # get version string from git repo
           git_version=$(git describe --dirty --tags)
-          echo "GIT version: '$git_version'."
+          echo "GIT version: '$(git describe)'."
           echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
           echo "GAWK_GIT_VERSION='$git_version'" >> $GITHUB_ENV
 
@@ -173,9 +174,9 @@ jobs:
           ## May 2022: this hack is needed since apt-get on Ubuntu provides
           ## gettext-0.19.8 only, while configure.ac requires a higher version.
           case '${{ matrix.os }}' in
-            #(ubuntu-*)
-            #  dpkg -s gettext
-            #;;
+            (ubuntu-*)
+              dpkg -s gettext
+            ;;
             (*) autoreconf -vfi
             ;;
           esac
