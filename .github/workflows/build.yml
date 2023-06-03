@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: master
           fetch-depth: 0
@@ -47,7 +47,7 @@ jobs:
       - name: Install packages
         run: |
           case "$MSYSTEM" in
-            (MSYS) pacman -S --noconfirm --needed gcc gettext-devel libreadline-devel mpfr-devel msys2-runtime-devel;;
+            (MSYS) pacman -S --noconfirm --needed autotools base gcc gettext-devel libintl libreadline libreadline-devel mpfr mpfr-devel msys2-runtime-devel;;
             (*)    pacboy -S --noconfirm --needed gcc:p gettext:p make:p mpfr:p readline:p ;;
           esac
 
@@ -67,9 +67,9 @@ jobs:
                   # we prefer to test a VPATH build
                   mkdir -p build
                   cd build
-                  ../configure -C --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
+                  ../configure -C --libexecdir=/usr/lib --without-libiconv-prefix --without-libintl-prefix
                   for e in log cache h; do
-                    echo "'config.$e':"
+                    echo "------ config.$e ---------"
                     cat "config.$e"
                   done
                   ;;
@@ -84,12 +84,12 @@ jobs:
           case "$MSYSTEM" in
             (MSYS)  cd build
                     if ! make V=0 CFLAGS='-Wall -Wextra -Wno-sign-compare -Wno-unused-parameter'; then
-                      ret=$?
                       make V=1 CFLAGS='-save-temps=obj' io.o || true
                       echo '----io.i----'
                       cat io.i
+                      echo '----config.log----'
                       cat config.log
-                      exit $ret
+                      exit 1
                     fi
                   ;;
             (*) MYCFLAGS='-pedantic -Wall'
@@ -111,7 +111,7 @@ jobs:
       - name: Run distcheck (autoconf only)
         run: |
           case "$MSYSTEM" in
-            (MSYS) make -C build distcheck DISTCHECK_CONFIGURE_FLAGS="--without-libiconv-prefix --without-libintl-prefix --without-libsigsegv";;
+            (MSYS) make -C build distcheck DISTCHECK_CONFIGURE_FLAGS='--libexecdir=/usr/lib --without-libiconv-prefix --without-libintl-prefix';;
             (*) exit 0;;
           esac
 
@@ -127,7 +127,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: master
           fetch-depth: 0
