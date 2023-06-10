@@ -68,7 +68,7 @@ jobs:
                   mkdir -p build
                   cd build
                   ../configure -C --without-libiconv-prefix --without-libintl-prefix --without-libsigsegv
-                  for e in log cache; do
+                  for e in log cache h; do
                     echo "'config.$e':"
                     cat "config.$e"
                   done
@@ -83,10 +83,20 @@ jobs:
         run: |
           case "$MSYSTEM" in
             (MSYS)  cd build
-                    make V=0 CFLAGS='-Wall -Wextra' || { ret=$?; make V=1; cat config.log; cat config.cache; exit $ret; }
+                    #export CFLAGS='-Wall -Wextra'
+                    if ! make V=0; then
+                      ret=$?
+                      make V=1
+                      for e in log cache h; do
+                        echo "============ config.$e ============="
+                        cat "config.$e"
+                        echo '=========================='
+                      done
+                      exit $ret
+                    fi
                   ;;
             (*) MYCFLAGS='-pedantic -Wall'
-                # MinGW-specifics: do not define type BOOL, because GAWK no infringes the Windows name space
+                # MinGW-specifics: do not define type BOOL, because GAWK infringes the Windows name space
                 # cf. https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/minwindef.h#l130
                 MYCFLAGS="$MYCFLAGS -D_NO_BOOL_TYPEDEF"
                 mingw32-make mingw32-readline-mpfr MYCFLAGS="$MYCFLAGS"
@@ -123,7 +133,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: master
-          #fetch-depth: 0
+          fetch-depth: 0  # required for git tags
 
       - name: Install packages
         run: |
