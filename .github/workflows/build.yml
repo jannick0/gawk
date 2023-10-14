@@ -83,17 +83,7 @@ jobs:
         run: |
           case "$MSYSTEM" in
             (MSYS)  cd build
-                    #export CFLAGS='-Wall -Wextra'
-                    if ! make V=0; then
-                      ret=$?
-                      make V=1
-                      for e in log cache h; do
-                        echo "============ config.$e ============="
-                        cat "config.$e"
-                        echo '=========================='
-                      done
-                      exit $ret
-                    fi
+                    make V=0 CFLAGS='-Wall -Wextra' || { ret=$?; make V=1; cat config.log; cat config.cache; exit $ret; }
                   ;;
             (*) MYCFLAGS='-pedantic -Wall'
                 # MinGW-specifics: do not define type BOOL, because GAWK infringes the Windows name space
@@ -133,7 +123,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: master
-          fetch-depth: 0  # required for git tags
+          fetch-depth: 0
 
       - name: Install packages
         run: |
@@ -147,6 +137,8 @@ jobs:
                     ;;
             (macos-*)  # NB mpfr and readline installed per default
                     brew update
+                    # https://stackoverflow.com/questions/12607155/error-the-brew-link-step-did-not-complete-successfully
+                    brew link --overwrite node
                     brew upgrade
                     brew install automake gettext coreutils gawk grep gnu-sed
                     # make the app versions without leading character 'g' available on PATH
@@ -162,7 +154,7 @@ jobs:
         run: |
           # get version string from git repo
           git_version=$(git describe --dirty --tags)
-          echo "GIT version: '$(git describe)'."
+          echo "GIT version: $git_version."
           echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
           echo "GAWK_GIT_VERSION='$git_version'" >> $GITHUB_ENV
 
