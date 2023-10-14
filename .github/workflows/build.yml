@@ -56,8 +56,8 @@ jobs:
           ./bootstrap.sh
 
           # get version string from git repo
-          echo "git version: '$(git describe)'"
           git_version=$(git describe --dirty --tags)
+          echo "git version: $git_version."
           echo 'const char *version_string = "'"$git_version"'";' > 'version.c'
           echo "GAWK_GIT_VERSION='$git_version'" >> $GITHUB_ENV
 
@@ -138,7 +138,7 @@ jobs:
             (macos-*)  # NB mpfr and readline installed per default
                     brew update
                     # https://stackoverflow.com/questions/12607155/error-the-brew-link-step-did-not-complete-successfully
-                    brew link --overwrite node
+                    brew unlink --overwrite node
                     brew upgrade
                     brew install automake gettext coreutils gawk grep gnu-sed
                     # make the app versions without leading character 'g' available on PATH
