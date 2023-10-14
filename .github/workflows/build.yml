@@ -47,7 +47,7 @@ jobs:
       - name: Install packages
         run: |
           case "$MSYSTEM" in
-            (MSYS) pacman -S --noconfirm --needed gcc gettext-devel libreadline-devel mpfr-devel ;;
+            (MSYS) pacman -S --noconfirm --needed gcc gettext-devel libreadline-devel mpfr-devel msys2-runtime-devel;;
             (*)    pacboy -S --noconfirm --needed gcc:p gettext:p make:p mpfr:p readline:p ;;
           esac
 
@@ -83,7 +83,13 @@ jobs:
         run: |
           case "$MSYSTEM" in
             (MSYS)  cd build
-                    make V=0 CFLAGS='-Wall -Wextra' || { ret=$?; make V=1; cat config.log; cat config.cache; exit $ret; }
+                    if ! make V=0 CFLAGS='-Wall -Wextra -Wno-sign-compare -Wno-unused-parameter'; then
+                      ret=$?
+                      make V=1
+                      cat config.log
+                      cat config.cache
+                      exit $ret
+                    fi
                   ;;
             (*) MYCFLAGS='-pedantic -Wall'
                 # MinGW-specifics: do not define type BOOL, because GAWK infringes the Windows name space
@@ -136,7 +142,7 @@ jobs:
                     sudo apt upgrade
                     ;;
             (macos-*)  # NB mpfr and readline installed per default
-                    brew update
+                    #brew update
                     ## https://stackoverflow.com/questions/12607155/error-the-brew-link-step-did-not-complete-successfully
                     #brew unlink node
                     #brew upgrade
@@ -167,22 +173,20 @@ jobs:
           # we prefer to test a VPATH build
           mkdir -p build
           cd build
-          GAWK_CONFIG_FLAGS=''
-          case '${{ matrix.os }}' in
-            (ubuntu-*) ;;
-            (macos-*) GAWK_CONFIG_FLAGS+=' -C';;
-          esac
-          ../configure $GAWK_CONFIG_FLAGS
-          for e in log cache; do
-            f="config.$e"
-            if test -f "$f"; then
-              echo "'$f':"
-              cat "$f"
-            fi
-          done
+          if ! ../configure ; then
+            rc=$?
+            for e in log cache; do
+              f="config.$e"
+              if test -f "$f"; then
+                echo "'$f':"
+                cat "$f"
+              fi
+            done
+            exit $?
+          fi
 
       - name: Build gawk app and extensions
-        run: make V=0 || { ret=$?; make V=1; cat config.log; cat config.cache; exit $ret; }
+        run: make V=0 || { ret=$?; make V=1; cat config.log; exit $ret; }
         working-directory: build
 
       - name: Run checks
@@ -190,5 +194,5 @@ jobs:
         working-directory: build
 
       - name: Run distcheck
-        run: make distcheck DISTCHECK_CONFIGURE_FLAGS="--build=$(gcc -dumpmachine) -C" || { ret=$?; cat config.log; cat config.cache; exit $ret; }
+        run: make distcheck DISTCHECK_CONFIGURE_FLAGS="--build=$(gcc -dumpmachine)" || { ret=$?; cat config.log; exit $ret; }
         working-directory: build
