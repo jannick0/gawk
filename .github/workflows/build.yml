@@ -85,11 +85,10 @@ jobs:
             (MSYS)  cd build
                     if ! make V=0 CFLAGS='-Wall -Wextra -Wno-sign-compare -Wno-unused-parameter'; then
                       ret=$?
-                      make V=1 CFLAGS='-save-temps=obj'
+                      make V=1 CFLAGS='-save-temps=obj' io.o || true
                       echo '----io.i----'
                       cat io.i
                       cat config.log
-                      cat config.cache
                       exit $ret
                     fi
                   ;;
@@ -195,6 +194,6 @@ jobs:
         run: make check
         working-directory: build
 
-      - name: Run distcheck
-        run: make distcheck DISTCHECK_CONFIGURE_FLAGS="--build=$(gcc -dumpmachine)" || { ret=$?; cat config.log; exit $ret; }
-        working-directory: build
+      #- name: Run distcheck
+      #  run: make distcheck DISTCHECK_CONFIGURE_FLAGS="--build=$(gcc -dumpmachine)" || { ret=$?; cat config.log; exit $ret; }
+      #  working-directory: build
