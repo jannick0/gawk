@@ -85,7 +85,9 @@ jobs:
             (MSYS)  cd build
                     if ! make V=0 CFLAGS='-Wall -Wextra -Wno-sign-compare -Wno-unused-parameter'; then
                       ret=$?
-                      make V=1
+                      make V=1 CFLAGS='-save-temps=obj'
+                      echo '----io.i----'
+                      cat io.i
                       cat config.log
                       cat config.cache
                       exit $ret
@@ -137,7 +139,7 @@ jobs:
           configure_flags=''
           case '${{ matrix.os }}' in
             (ubuntu-*) sudo apt update
-                    sudo apt install -y gettext autopoint libmpfr-dev libeditreadline-dev lzip
+                    sudo apt install -y gettext autopoint libmpfr-dev libeditreadline-dev lzip texlive
                     # fingers crossed that this upgrades all packages to the highest version available
                     sudo apt upgrade
                     ;;
@@ -146,7 +148,7 @@ jobs:
                     ## https://stackoverflow.com/questions/12607155/error-the-brew-link-step-did-not-complete-successfully
                     #brew unlink node
                     #brew upgrade
-                    brew install automake gettext coreutils gawk grep gnu-sed
+                    brew install automake gettext coreutils gawk grep gnu-sed lzip texlive
                     # make the app versions without leading character 'g' available on PATH
                     for p in coreutils grep gnu-sed; do
                       export PATH="/usr/local/opt/$p/libexec/gnubin:$PATH"
