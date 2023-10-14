@@ -138,7 +138,7 @@ jobs:
             (macos-*)  # NB mpfr and readline installed per default
                     brew update
                     # https://stackoverflow.com/questions/12607155/error-the-brew-link-step-did-not-complete-successfully
-                    brew unlink --overwrite node
+                    brew unlink node
                     brew upgrade
                     brew install automake gettext coreutils gawk grep gnu-sed
                     # make the app versions without leading character 'g' available on PATH
@@ -167,10 +167,18 @@ jobs:
           # we prefer to test a VPATH build
           mkdir -p build
           cd build
-          ../configure -C # $GAWK_CONFIGURE_FLAGS
+          GAWK_CONFIG_FLAGS=''
+          case '${{ matrix.os }}' in
+            (ubuntu-*) ;;
+            (macos-*) GAWK_CONFIG_FLAGS+=' -C';;
+          esac
+          ../configure $GAWK_CONFIG_FLAGS
           for e in log cache; do
-            echo "'config.$e':"
-            cat "config.$e"
+            f="config.$e"
+            if test -f "$f"; then
+              echo "'$f':"
+              cat "$f"
+            fi
           done
 
       - name: Build gawk app and extensions
