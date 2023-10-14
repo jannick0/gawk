@@ -131,15 +131,15 @@ jobs:
           configure_flags=''
           case '${{ matrix.os }}' in
             (ubuntu-*) sudo apt update
-                    sudo apt install gettext autopoint libmpfr-dev libeditreadline-dev
+                    sudo apt install -y gettext autopoint libmpfr-dev libeditreadline-dev lzip
                     # fingers crossed that this upgrades all packages to the highest version available
                     sudo apt upgrade
                     ;;
             (macos-*)  # NB mpfr and readline installed per default
                     brew update
-                    # https://stackoverflow.com/questions/12607155/error-the-brew-link-step-did-not-complete-successfully
-                    brew unlink node
-                    brew upgrade
+                    ## https://stackoverflow.com/questions/12607155/error-the-brew-link-step-did-not-complete-successfully
+                    #brew unlink node
+                    #brew upgrade
                     brew install automake gettext coreutils gawk grep gnu-sed
                     # make the app versions without leading character 'g' available on PATH
                     for p in coreutils grep gnu-sed; do
