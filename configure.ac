@@ -180,10 +180,10 @@ AM_LANGINFO_CODESET
 gt_LC_MESSAGES
 
 dnl checks for header files
-AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h \
-	netdb.h netinet/in.h stddef.h string.h \
-	sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/time.h unistd.h \
-	termios.h stropts.h wchar.h wctype.h)
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h locale.h libintl.h mcheck.h
+	netdb.h netinet/in.h stddef.h string.h
+	sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/time.h unistd.h
+	termios.h stropts.h wchar.h wctype.h])
 
 gl_C_BOOL
 AC_HEADER_SYS_WAIT
@@ -307,14 +307,14 @@ AC_SEARCH_LIBS(ismod, m)
 AC_SEARCH_LIBS(isnan, m)
 
 # Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
-AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
-	getgrent getgroups grantpt isascii isblank iswctype iswlower iswupper \
-	lstat \
-	mbrlen memcmp memcpy memmove memset \
-	mkstemp mtrace posix_openpt setenv setlocale setsid sigprocmask \
-	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp \
-	strsignal strtod strtoul system timegm tmpfile towlower towupper \
-	tzset usleep waitpid wcrtomb wcscoll wctype)
+AC_CHECK_FUNCS([__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror
+	getgrent getgroups grantpt isascii isblank iswctype iswlower iswupper
+	lstat
+	mbrlen memcmp memcpy memmove memset
+	mkstemp mtrace posix_openpt setenv setlocale setsid sigprocmask
+	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp
+	strsignal strtod strtoul system timegm tmpfile towlower towupper
+	tzset usleep waitpid wcrtomb wcscoll wctype])
 dnl this check is for both mbrtowc and the mbstate_t type, which is good
 AC_FUNC_MBRTOWC
 
