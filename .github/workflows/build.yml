@@ -3,7 +3,7 @@ name: build and check
 on:
   push:
     branches-ignore:
-      - workflow
+      - workflows
   pull_request:
   workflow_dispatch:
   workflow_run:
