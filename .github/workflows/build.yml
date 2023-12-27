@@ -2,8 +2,8 @@ name: build and check
 
 on:
   push:
-    branches-ignore:
-      - workflows
+    #branches-ignore:
+    #  - workflows
   pull_request:
   workflow_dispatch:
   workflow_run:
