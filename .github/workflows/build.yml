@@ -30,14 +30,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: master
+          #ref: master
           fetch-depth: 0
+          fetch-tags: true
 
       - name: Prepare MSYS2 system
         uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
-          install: git base-devel autotools pactoys
+          install: git base base-devel autotools pactoys
           update: true
           path-type: minimal
 
@@ -47,7 +48,7 @@ jobs:
       - name: Install packages
         run: |
           case "$MSYSTEM" in
-            (MSYS) pacman -S --noconfirm --needed autotools base gcc gettext-devel libintl libreadline libreadline-devel mpfr mpfr-devel msys2-runtime-devel;;
+            (MSYS) pacman -S --noconfirm --needed gcc gettext gettext-devel libintl libreadline libreadline-devel mpfr mpfr-devel msys2-runtime msys2-runtime-devel;;
             (*)    pacboy -S --noconfirm --needed gcc:p gettext:p make:p mpfr:p readline:p ;;
           esac
 
@@ -64,16 +65,10 @@ jobs:
           # prepare build system
           case "$MSYSTEM" in
             (MSYS) autoreconf -vfi
-                  #diff -u configure~ configure
-                  #cp -v configure~ configure
                   # we prefer to test a VPATH build
                   mkdir -p build
                   cd build
                   ../configure -C --libexecdir=/usr/lib --without-libiconv-prefix --without-libintl-prefix
-                  for e in log cache h; do
-                    echo "------ config.$e ---------"
-                    cat "config.$e"
-                  done
                   ;;
             (*) cp -v pc/{Makefile,*.h,*.c,testoutcmp.awk} .
                 cp -v pc/Makefile.ext ./extension/Makefile
@@ -85,13 +80,8 @@ jobs:
         run: |
           case "$MSYSTEM" in
             (MSYS)  cd build
-                    if ! make V=0 CFLAGS='-Wall -Wextra -Wno-sign-compare -Wno-unused-parameter'; then
-                      make V=1 CFLAGS='-save-temps=obj' io.o || true
-                      echo '----io.i----'
-                      cat io.i
-                      echo '----config.log----'
-                      cat config.log
-                      exit 1
+                    make V=0 CFLAGS='-Wall -Wextra -Wno-sign-compare -Wno-unused-parameter' \
+                      || make V=1 CFLAGS='-Wall -Wextra -Wno-sign-compare -Wno-unused-parameter'
                     fi
                   ;;
             (*) MYCFLAGS='-pedantic -Wall'
