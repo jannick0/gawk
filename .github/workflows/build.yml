@@ -64,6 +64,8 @@ jobs:
           # prepare build system
           case "$MSYSTEM" in
             (MSYS) autoreconf -vfi
+                  diff -u configure~ configure
+                  cp -v configure~ configure
                   # we prefer to test a VPATH build
                   mkdir -p build
                   cd build
