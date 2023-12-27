@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: master
           fetch-depth: 0
@@ -21,6 +21,6 @@ jobs:
           git remote add upstream 'https://git.savannah.gnu.org/git/gawk.git'
           echo 'Show remote repos again:'
           git remote -v
-          git fetch upstream
+          git fetch upstream master --tags
           git merge 'upstream/master'
-          git push
+          git push --tags
