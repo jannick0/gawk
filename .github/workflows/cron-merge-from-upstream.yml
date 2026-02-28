@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
       - name: Merge Savannah repo to master
         run: |
-          git --global core.autocrlf input
+          git config --global core.autocrlf input
           echo 'Show remote repos:'
           git remote -v
           git remote add upstream 'https://git.savannah.gnu.org/git/gawk.git'
