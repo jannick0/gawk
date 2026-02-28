@@ -45,6 +45,17 @@ jobs:
             (*)    pacboy -S --noconfirm --needed gcc:p gettext:p make:p mpfr:p readline:p ;;
           esac
 
+      
+      - name: Handle EOL when gitting
+        run: git config --global core.autocrlf input
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: master
+          fetch-depth: 0
+          fetch-tags: true
+
       - name: Configure system
         run: |
           ./bootstrap.sh
@@ -68,17 +79,7 @@ jobs:
                 cp -v pc/Makefile.tst ./test/Makefile
                   ;;
           esac
-      
-      - name: Handle EOL when gitting
-        run: git config --global core.autocrlf input
 
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: master
-          fetch-depth: 0
-          fetch-tags: true
-      
       - name: Build gawk app and extensions
         run: |
           case "$MSYSTEM" in
