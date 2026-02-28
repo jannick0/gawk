@@ -27,16 +27,6 @@ jobs:
         shell: msys2 {0}
 
     steps:
-      - name: Handle EOL when gitting
-        run: git config --global core.autocrlf input
-
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: master
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Prepare MSYS2 system
         uses: msys2/setup-msys2@v2
         with:
@@ -78,7 +68,17 @@ jobs:
                 cp -v pc/Makefile.tst ./test/Makefile
                   ;;
           esac
+      
+      - name: Handle EOL when gitting
+        run: git config --global core.autocrlf input
 
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: master
+          fetch-depth: 0
+          fetch-tags: true
+      
       - name: Build gawk app and extensions
         run: |
           case "$MSYSTEM" in
